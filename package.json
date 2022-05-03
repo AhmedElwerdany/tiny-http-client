@@ -1,0 +1,13 @@
+{
+  "name": "tiny-http",
+  "version": "1.0.0",
+  "description": "write raw http requests",
+  "main": "index.js",
+  "scripts": {
+    "client": "node client.js",
+    "server": "node httpServer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

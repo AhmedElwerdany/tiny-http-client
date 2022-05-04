@@ -1,35 +1,48 @@
-const { prepareToSend } = require('./helpers.js')
-// Include Nodejs' net module.
-const Net = require('net');
-// The port number and hostname of the server.
-const port = 8080;
-const host = 'localhost';
+const Net = require("net");
 
-// Create a new TCP client.
-const client = new Net.Socket();
+const { prepareToSend } = require("./helpers.js");
 
-// Send a connection request to the server.
-client.connect(({ port: port, host: host }), function() {
-    // If there is no error, the server has accepted the request and created a new 
-    // socket dedicated to us.
-    console.log('TCP connection established with the server.');
-    
-    // add request here
-    const request = `GET /hello HTTP/1.1
-    Host: localhost`
 
-    // The client can now send data to the server by writing to its socket.
-    client.write(prepareToSend(request));
-});
+class Http {
+  constructor(info) {
+    this.host = info.host;
+    this.port = info.port;
+    this.client = new Net.Socket();
+    this.connected = false;
+  }
 
-// The client can also receive data from the server by reading from its socket.
-client.on('data', function(chunk) {
-    console.log(`Data received from the server: ${chunk.toString()}.`);
-    
-    // Request an end to the connection after the data has been received.
-    client.end();
-});
+  connect(info) {
 
-client.on('end', function() {
-    console.log('Requested an end to the TCP connection');
-});
+    return new Promise((resolve, reject) => {
+      const client = this.client
+      if (info?.host && info?.port) {
+        this.host = info.host;
+        this.port = info.port;
+      }
+
+      if (!this.host) {
+        reject("Host Missied")
+      }
+
+      if (!this.port) {
+        reject("Port Missied");
+      }
+
+      this.client.connect({ host: this.host, port: this.port }, function () {
+            this.connected = true;
+            resolve(client)
+      });
+
+
+    });
+
+  }
+
+  request(raw_request) {
+    this.client.write(prepareToSend(raw_request), () => {
+      return this.client;
+    });
+  }
+}
+
+module.exports = Http

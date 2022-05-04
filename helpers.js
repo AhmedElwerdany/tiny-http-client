@@ -7,9 +7,11 @@ const prepareToSend = request => {
     end = [0x0d, 0x0a]
 
     request = request.split('\n').map(r => {
-        r = Buffer.from(r)
-        r = Array.from(r)
-        r.push(...end)
+        if(r !== '\n' || r !== '\r' || r.trim() !== '') {
+            r = Buffer.from(r)
+            r = Array.from(r)
+            r.push(...end)
+        }
         return r
     })
 
